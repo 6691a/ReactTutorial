@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { memo } from 'react';
 import styles from './menu.module.css'
 
-const Menu = (props) => (
+const Menu = memo( (props) => (
     <ul className={styles.menu}>
         <li className={styles.home}>
             <img className={styles.ui_img} src="/images/youtube12.png"/>
@@ -17,6 +17,6 @@ const Menu = (props) => (
             <span className={styles.text}>구독</span>
         </li>
     </ul>
-    );
+    ));
 
 export default Menu;

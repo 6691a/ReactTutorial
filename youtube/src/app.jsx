@@ -1,37 +1,55 @@
-import React,{ useEffect, useState } from 'react';
+import React,{ useCallback ,useEffect, useState } from 'react';
 import styles from './app.module.css';
 import Header from './componets/header/header';
 import Menu from './componets/menu/menu';
-
 import Video_list from './componets/video_list/video_list';
+import Video_detail from './componets/video_detail/video_detail';
 
-function App() {
+
+function App({youtube}) {
   const [videos, setVideos] = useState([]);
-  
-  useEffect(() => {
-    var requestOptions = {
-      method: 'GET',
-      redirect: 'follow'
-    };
-    
-    fetch("https://www.googleapis.com/youtube/v3/videos?part=snippet&chart=mostPopular&maxResults=24&regionCode=KR&key=AIzaSyAdKiYBVAtwzpuVYaDwwpcq71x2Z4urqv0", requestOptions)
-      .then(response => response.json())
-      .then(result => setVideos(result.items))
-      .catch(error => console.log('error', error));
+  const [selectedVideo, setSelectedVideo] = useState(null);
 
-  }, []);
+  const selectVideo =(video) =>{
+    setSelectedVideo(video);
+  }
+
+  const search = useCallback( (query) => {
+    youtube.search(query)
+    .then(videos => {
+      setVideos(videos);
+      setSelectedVideo(null);
+    });
+  },[youtube])
+
+  useEffect(() => {
+    youtube.mostPopular()
+    .then(videos => setVideos(videos));
+
+  }, [youtube]);
+
   return (
   <div>
-    <Header/>
+    <Header onSearch={search}/>
     <div className={styles.app}>
-      <Menu className={styles.menu}/>
-      <Video_list videos={videos} />
+      
+      <section className={styles.content}>
+      <div className={styles.menu}>
+      <Menu/>
+      </div>
+      {selectedVideo &&<div className={styles.detail}>
+          <Video_detail video={selectedVideo}/>
+        </div>
+      }
+        <div className={selectedVideo ? styles.detail_list : styles.list}>
+        <Video_list videos={videos} onVideoClick={selectVideo}/>
+        </div>
+        
+      </section>
+      
     </div>
   </div>
   );
-  
-  
-  
 }
 
 export default App;
